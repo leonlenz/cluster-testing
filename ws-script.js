@@ -16,6 +16,7 @@ const MAX_CHAT_PEERS = +(__ENV.MAX_CHAT_PEERS) || (TOTAL_USERS - 1);
 export let wsErrors    = new Counter('ws_error_count');
 export let stompErrors = new Counter('stomp_error_count');
 export let msgRTT      = new Trend('chat_message_rtt_ms');
+export let messagesReceived = new Counter('messages_received_total');
 
 // CACHE CREDENTIALS
 let userCreds = {};
@@ -137,6 +138,7 @@ export default function () {
         if (body && body.includes(`ping:${nonce}`)) {
           const rtt = Date.now() - start;
           msgRTT.add(rtt);
+          messagesReceived.add(1);
           console.log(`VU${vu}: Pong received nonce=${nonce}, RTT=${rtt}ms`);
         }
       });
