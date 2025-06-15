@@ -17,6 +17,7 @@ export let wsErrors    = new Counter('ws_error_count');
 export let stompErrors = new Counter('stomp_error_count');
 export let msgRTT      = new Trend('chat_message_rtt_ms');
 export let messagesReceived = new Counter('messages_received_total');
+export let messagesSent = new Counter('messages_sent_total');
 
 // CACHE CREDENTIALS
 let userCreds = {};
@@ -73,9 +74,9 @@ export default function () {
       const text = msg.toString();
       if (state === 'CONNECTING') {
         if (text.startsWith('CONNECTED')) {
-          console.log(`VU${vu}: STOMP CONNECTED`);
+          //console.log(`VU${vu}: STOMP CONNECTED`);
           socket.send(subFrame);
-          console.log(`VU${vu}: SENT SUBSCRIBE`);
+          //console.log(`VU${vu}: SENT SUBSCRIBE`);
           state = 'CHATTING';
           // Get existing chats instead of creating new ones
           let getChatsResponse = http.get(
@@ -89,7 +90,7 @@ export default function () {
               chatsData.chats.forEach(chat => {
                 chatIds.push(chat.chatId);
               });
-              console.log(`VU${vu}: Retrieved ${chatIds.length} existing chats: [${chatIds.join(', ')}]`);
+              //console.log(`VU${vu}: Retrieved ${chatIds.length} existing chats: [${chatIds.join(', ')}]`);
             } else {
               console.warn(`VU${vu}: No chats found in response`);
             }
@@ -113,11 +114,11 @@ export default function () {
     // chat ping loop with logging
     socket.setInterval(() => {
       if (state !== 'CHATTING') {
-        console.log(`VU${vu}: Ping skipped, state=${state}`);
+        //console.log(`VU${vu}: Ping skipped, state=${state}`);
         return;
       }
       if (!chatIds.length) {
-        console.log(`VU${vu}: No chatIds yet`);
+        //console.log(`VU${vu}: No chatIds yet`);
         return;
       }
       const cid  = chatIds[Math.floor(Math.random() * chatIds.length)];
@@ -132,14 +133,20 @@ export default function () {
       console.log(`VU${vu}: Sending ping to ${cid}, nonce=${nonce}`);
       const start = Date.now();
       socket.send(frame);
+      messagesSent.add(1);
       socket.on('message', m => {
         const body = m.toString().split('\n\n')[1]?.replace(/\0$/, '');
-        console.log(body);
-        if (body && body.includes(`ping:${nonce}`)) {
-          const rtt = Date.now() - start;
-          msgRTT.add(rtt);
-          messagesReceived.add(1);
-          console.log(`VU${vu}: Pong received nonce=${nonce}, RTT=${rtt}ms`);
+        //console.log(body);
+        if (body) {
+          if (body.includes(`ping:${nonce}`)) {
+            const rtt = Date.now() - start;
+            msgRTT.add(rtt);
+            messagesReceived.add(1);
+            console.log(`VU${vu}: Pong received nonce=${nonce}, RTT=${rtt}ms`);
+          } else if (body.includes(`SEND_MSG`)) {
+            messagesReceived.add(1);
+            console.log(`Message received. No RTT`);
+          }
         }
       });
     }, 6000);
