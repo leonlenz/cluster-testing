@@ -30,16 +30,16 @@ export let options = {
 
 export default function () {
   const vu = __VU;
-  const username = `${USER_PREFIX}${vu}2`;
+  const username = `${USER_PREFIX}${vu}3`;
 
   // 1) Register/login once
   if (!userCreds[vu]) {
-    const payload = { username, firstName: 'random', surName: 'random', email: `${username}2@example.com`, password: PASSWORD };
+    const payload = { username, firstName: 'random', surName: 'random', email: `${username}3@example.com`, password: PASSWORD };
     // register
     let reg = http.post(`${API_BASE_URL}/api/user/registerUser`, JSON.stringify(payload), { headers: { 'Content-Type': 'application/json' } });
     check(reg, { 'register ok': r => r.status === 201 });
     if (reg.status !== 201) {
-      console.error(`VU${vu} register error ${reg.status} body: ${reg.json()}`);
+      console.error(`VU${vu} register error ${reg.status} body: ${reg.body}`);
       return;
     }
     // login
