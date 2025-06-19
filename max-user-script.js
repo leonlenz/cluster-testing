@@ -22,8 +22,8 @@ let userCreds = {};
 
 export let options = {
   stages: [
-    { duration: '1m', target: 100000 },
-    { duration: '3m', target: 100000 },
+    { duration: '1m', target: 10000 },
+    { duration: '1m', target: 10000 },
     { duration: '1m', target:    0 },
   ],
 };
