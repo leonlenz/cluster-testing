@@ -5,8 +5,8 @@ import { check, sleep } from 'k6';
 import { Trend, Counter } from 'k6/metrics';
 
 // CONFIG
-const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://harmless-guppy.api.whispchat.com';
-const WS_URL         = __ENV.WS_URL         || 'wss://harmless-guppy.api.whispchat.com/api/wsConnect';
+const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://perfect-starfish.api.whispchat.com';
+const WS_URL         = __ENV.WS_URL         || 'wss://perfect-starfish.api.whispchat.com/api/wsConnect';
 const USER_PREFIX    = __ENV.USER_PREFIX    || 'user';
 const PASSWORD       = __ENV.PASSWORD       || 'password123';
 const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 1000;

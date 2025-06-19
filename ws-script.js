@@ -5,8 +5,8 @@ import { check, sleep } from 'k6';
 import { Trend, Counter } from 'k6/metrics';
 
 // CONFIG
-const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://harmless-guppy.api.whispchat.com';
-const WS_URL         = __ENV.WS_URL         || 'wss://harmless-guppy.api.whispchat.com/api/wsConnect';
+const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://perfect-starfish.api.whispchat.com';
+const WS_URL         = __ENV.WS_URL         || 'wss://perfect-starfish.api.whispchat.com/api/wsConnect';
 const USER_PREFIX    = __ENV.USER_PREFIX    || 'user';
 const PASSWORD       = __ENV.PASSWORD       || 'password123';
 const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 1250;
@@ -26,7 +26,7 @@ export let options = {
   stages: [
     { duration: '1m', target: 1250 },
     { duration: '3m', target: 1250 },
-    { duration: '1m', target:    0 },
+    { duration: '3m', target:    0 },
   ],
 };
 
@@ -52,7 +52,7 @@ export default function () {
 
   // 2) WebSocket + STOMP state machine
   let wsRes = ws.connect(WS_URL, { headers: { Authorization: `Bearer ${jwt}` } }, socket => {
-    console.log(`VU${vu}: WS connected`);
+    //console.log(`VU${vu}: WS connected`);
     const connectFrame =
       'CONNECT\n' +
       'accept-version:1.2\n' +
@@ -66,7 +66,7 @@ export default function () {
     let state = 'CONNECTING';
 
     socket.on('open', () => {
-      console.log(`VU${vu}: WS open, sending CONNECT`);
+      //console.log(`VU${vu}: WS open, sending CONNECT`);
       socket.send(connectFrame);
     });
 
