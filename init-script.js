@@ -5,8 +5,8 @@ import { check, sleep } from 'k6';
 import { Trend, Counter } from 'k6/metrics';
 
 // CONFIG
-const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://fair-firefly.api.whispchat.com';
-const WS_URL         = __ENV.WS_URL         || 'wss://fair-firefly.api.whispchat.com/api/wsConnect';
+const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://ready-oarfish.api.whispchat.com';
+const WS_URL         = __ENV.WS_URL         || 'wss://ready-oarfish.api.whispchat.com/api/wsConnect';
 const USER_PREFIX    = __ENV.USER_PREFIX    || 'user';
 const PASSWORD       = __ENV.PASSWORD       || 'password123';
 const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 1000;
