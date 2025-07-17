@@ -70,9 +70,30 @@ export default function () {
       socket.send(connectFrame);
     });
 
+    const pendingPings = {};
+
     socket.on('message', msg => {
       const text = msg.toString();
-      if (state === 'CONNECTING') {
+      if (state === 'CHATTING') {
+        const match = text.match(/"ping:(\d+)"/);
+        if (match) {
+          messagesReceived.add(1);
+          const nonce = match[1];            // the digits only
+
+          const start = pendingPings[nonce]; // timestamp when we sent it
+          if (start !== undefined) {
+            // Compute and record RTT
+            const rtt = Date.now() - start;
+            msgRTT.add(rtt);
+            delete pendingPings[nonce];      // clean up
+            console.log(`VU${vu}: Pong ${nonce} RTT=${rtt}ms`);
+          }
+          else {
+            console.log(`Message received from other user`);
+          }
+        }
+      }
+      else if (state === 'CONNECTING') {
         if (text.startsWith('CONNECTED')) {
           //console.log(`VU${vu}: STOMP CONNECTED`);
           socket.send(subFrame);
@@ -122,7 +143,12 @@ export default function () {
         return;
       }
       const cid  = chatIds[Math.floor(Math.random() * chatIds.length)];
-      const nonce = `${Date.now()}`;
+
+      const ts = Date.now();
+      const nonce = `${ts}`;
+
+      pendingPings[nonce] = ts;
+
       const messageObject = {type: 'SEND_MSG', senderId: userId, chatId: cid, message: `ping:${nonce}`, timeStamp: new Date().toISOString()};
       const frame =
         'SEND\n' +
@@ -131,24 +157,8 @@ export default function () {
         JSON.stringify(messageObject) +
         '\0';
       console.log(`VU${vu}: Sending ping to ${cid}, nonce=${nonce}`);
-      const start = Date.now();
       socket.send(frame);
       messagesSent.add(1);
-      socket.on('message', m => {
-        const body = m.toString().split('\n\n')[1]?.replace(/\0$/, '');
-        //console.log(body);
-        if (body) {
-          if (body.includes(`ping:${nonce}`)) {
-            const rtt = Date.now() - start;
-            msgRTT.add(rtt);
-            messagesReceived.add(1);
-            console.log(`VU${vu}: Pong received nonce=${nonce}, RTT=${rtt}ms`);
-          } else if (body.includes(`SEND_MSG`)) {
-            messagesReceived.add(1);
-            console.log(`Message received. No RTT`);
-          }
-        }
-      });
     }, 6000);
   });
 
