@@ -18,6 +18,7 @@ export let stompErrors = new Counter('stomp_error_count');
 export let msgRTT      = new Trend('chat_message_rtt_ms');
 export let messagesReceived = new Counter('messages_received_total');
 export let messagesSent = new Counter('messages_sent_total');
+export let getChatReq = new Counter('get_chat_req');
 
 // CACHE CREDENTIALS
 let userCreds = {};
@@ -95,7 +96,7 @@ export default function () {
       }
       else if (state === 'CONNECTING') {
         if (text.startsWith('CONNECTED')) {
-          //console.log(`VU${vu}: STOMP CONNECTED`);
+          console.log(`VU${vu}: STOMP CONNECTED`);
           socket.send(subFrame);
           //console.log(`VU${vu}: SENT SUBSCRIBE`);
           state = 'CHATTING';
@@ -104,6 +105,7 @@ export default function () {
             `${API_BASE_URL}/api/chat/getChats`,
             { headers: { 'Content-Type': 'application/json', 'Authorization': jwt } }
           );
+          getChatReq.add(1);
           check(getChatsResponse, { 'get chats ok': r => r.status === 200 });
           if (getChatsResponse.status === 200) {
             const chatsData = getChatsResponse.json();
