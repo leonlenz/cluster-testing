@@ -9,8 +9,8 @@ const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://internal-dogfish.api.whi
 const WS_URL         = __ENV.WS_URL         || 'wss://internal-dogfish.api.whispchat.com/api/wsConnect';
 const USER_PREFIX    = __ENV.USER_PREFIX    || 'user';
 const PASSWORD       = __ENV.PASSWORD       || 'password123';
-const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 1000;
-const MAX_CHAT_PEERS = +(__ENV.MAX_CHAT_PEERS) || (TOTAL_USERS - 1);
+const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 5000;
+const MAX_CHAT_PEERS = +(__ENV.MAX_CHAT_PEERS) || 100;
 
 // METRICS
 export let wsErrors    = new Counter('ws_error_count');
@@ -22,8 +22,8 @@ let userCreds = {};
 
 export let options = {
   stages: [
-    { duration: '1m', target: 1250 },
-    { duration: '3m', target: 1250 },
+    { duration: '1m', target: TOTAL_USERS },
+    { duration: '3m', target: TOTAL_USERS },
     { duration: '1m', target:    0 },
   ],
 };
@@ -59,7 +59,7 @@ export default function () {
   let chatIds = [];
 
   for (let i = vu + 1; i <= TOTAL_USERS && chatIds.length < MAX_CHAT_PEERS; i++) {
-    let other = `${USER_PREFIX}${i}`;
+    let other = `${USER_PREFIX}${Math.floor(Math.random() * (TOTAL_USERS - 1)) + 1}`;
     let c = http.post(
         `${API_BASE_URL}/api/chat/createChat`,
         JSON.stringify({ chatName: "test Name", userNames: [`${USER_PREFIX}${vu}`, other] }),

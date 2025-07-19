@@ -9,8 +9,7 @@ const API_BASE_URL   = __ENV.API_BASE_URL   || 'https://internal-dogfish.api.whi
 const WS_URL         = __ENV.WS_URL         || 'wss://internal-dogfish.api.whispchat.com/api/wsConnect';
 const USER_PREFIX    = __ENV.USER_PREFIX    || 'user';
 const PASSWORD       = __ENV.PASSWORD       || 'password123';
-const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 1250;
-const MAX_CHAT_PEERS = +(__ENV.MAX_CHAT_PEERS) || (TOTAL_USERS - 1);
+const TOTAL_USERS    = +(__ENV.TOTAL_USERS)    || 5000;
 
 // METRICS
 export let wsErrors    = new Counter('ws_error_count');
@@ -19,14 +18,17 @@ export let msgRTT      = new Trend('chat_message_rtt_ms');
 export let messagesReceived = new Counter('messages_received_total');
 export let messagesSent = new Counter('messages_sent_total');
 export let getChatReq = new Counter('get_chat_req');
+export let undeliveredMessages = new Counter('undelivered_messages');
 
 // CACHE CREDENTIALS
 let userCreds = {};
 
+const globalPendingPings = {};
+
 export let options = {
   stages: [
-    { duration: '1m', target: 1250 },
-    { duration: '3m', target: 1250 },
+    { duration: '1m', target: TOTAL_USERS },
+    { duration: '3m', target: TOTAL_USERS },
     { duration: '3m', target:    0 },
   ],
 };
@@ -72,6 +74,8 @@ export default function () {
     });
 
     const pendingPings = {};
+
+    globalPendingPings[vu] = pendingPings;
 
     socket.on('message', msg => {
       const text = msg.toString();
@@ -166,4 +170,13 @@ export default function () {
 
   check(wsRes, { 'WS handshake 101': r => r && r.status === 101 });
   sleep(1);
+}
+
+export function teardown() {
+  let totalUndelivered = 0;
+  for (let vu in globalPendingPings) {
+    totalUndelivered += Object.keys(globalPendingPings[vu]).length;
+  }
+  console.log(`Total undelivered pings: ${totalUndelivered}`);
+  undeliveredMessages.add(totalUndelivered);
 }
