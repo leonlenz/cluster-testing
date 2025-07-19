@@ -74,6 +74,7 @@ export default function () {
     } else {
       console.error(`VU${vu}: CreateChat ${other} error ${c.status} body: ${c.body}`);
     }
+    sleep(5);
   }
   sleep(1);
 }
