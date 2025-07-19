@@ -31,9 +31,9 @@ export let options = {
     user_registration: {
       executor: 'ramping-vus',
       stages: [
-        { duration: '2m', target: TOTAL_USERS },  // Ramp up for registration
-        { duration: '1m', target: TOTAL_USERS },  // Hold for registration completion
-        { duration: '30s', target: 0 },           // Ramp down
+        { duration: '3m', target: TOTAL_USERS },  // Ramp up for registration
+        { duration: '3m', target: TOTAL_USERS },  // Hold for registration completion
+        { duration: '1m', target: 0 },           // Ramp down
       ],
       exec: 'registerUsers',
       startTime: '0s',
@@ -43,12 +43,12 @@ export let options = {
     chat_creation: {
       executor: 'ramping-vus',
       stages: [
-        { duration: '1m', target: TOTAL_USERS },  // Ramp up for chat creation
-        { duration: '5m', target: TOTAL_USERS },  // Hold for chat creation
+        { duration: '3m', target: TOTAL_USERS },  // Ramp up for chat creation
+        { duration: '3m', target: TOTAL_USERS },  // Hold for chat creation
         { duration: '1m', target: 0 },            // Ramp down
       ],
       exec: 'createChats',
-      startTime: '3m30s', // Start after registration stage completes
+      startTime: '7m', // Start after registration stage completes
     }
   }
 };
@@ -80,6 +80,7 @@ export function registerUsers() {
   if (reg.status !== 201) {
     console.error(`VU${vu} register error ${reg.status} body: ${reg.body}`);
     registrationErrors.add(1);
+    sleep(0.5);
     return;
   }
 
@@ -95,6 +96,7 @@ export function registerUsers() {
   if (login.status !== 200) {
     console.error(`VU${vu} login error ${login.status} body: ${login.body}`);
     registrationErrors.add(1);
+    sleep(0.5);
     return;
   }
 
@@ -168,6 +170,7 @@ export function createChats() {
       const chatId = chatResponse.json('chatId');
       chatIds.push(chatId);
       console.log(`VU${vu}: Chat ${i+1}/${chatsToCreate} created with ${otherUsername} => ${chatId}`);
+      sleep(0.5)
     } else {
       console.error(`VU${vu}: CreateChat with ${otherUsername} error ${chatResponse.status} body: ${chatResponse.body}`);
       chatCreationErrors.add(1);
