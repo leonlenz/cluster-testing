@@ -31,8 +31,8 @@ export let options = {
     user_registration: {
       executor: 'ramping-vus',
       stages: [
-        { duration: '3m', target: TOTAL_USERS },  // Ramp up for registration
-        { duration: '3m', target: TOTAL_USERS },  // Hold for registration completion
+        { duration: '4m', target: TOTAL_USERS },  // Ramp up for registration
+        { duration: '5m', target: TOTAL_USERS },  // Hold for registration completion
         { duration: '1m', target: 0 },           // Ramp down
       ],
       exec: 'registerUsers',
@@ -43,12 +43,12 @@ export let options = {
     chat_creation: {
       executor: 'ramping-vus',
       stages: [
-        { duration: '3m', target: TOTAL_USERS },  // Ramp up for chat creation
-        { duration: '3m', target: TOTAL_USERS },  // Hold for chat creation
+        { duration: '4m', target: TOTAL_USERS },  // Ramp up for chat creation
+        { duration: '5m', target: TOTAL_USERS },  // Hold for chat creation
         { duration: '1m', target: 0 },            // Ramp down
       ],
       exec: 'createChats',
-      startTime: '7m', // Start after registration stage completes
+      startTime: '10m', // Start after registration stage completes
     }
   }
 };
@@ -80,7 +80,7 @@ export function registerUsers() {
   if (reg.status !== 201) {
     console.error(`VU${vu} register error ${reg.status} body: ${reg.body}`);
     registrationErrors.add(1);
-    sleep(0.5);
+    sleep(1.5);
     return;
   }
 
@@ -96,7 +96,7 @@ export function registerUsers() {
   if (login.status !== 200) {
     console.error(`VU${vu} login error ${login.status} body: ${login.body}`);
     registrationErrors.add(1);
-    sleep(0.5);
+    sleep(1.5);
     return;
   }
 
@@ -170,14 +170,14 @@ export function createChats() {
       const chatId = chatResponse.json('chatId');
       chatIds.push(chatId);
       console.log(`VU${vu}: Chat ${i+1}/${chatsToCreate} created with ${otherUsername} => ${chatId}`);
-      sleep(0.5)
+      sleep(1.5)
     } else {
       console.error(`VU${vu}: CreateChat with ${otherUsername} error ${chatResponse.status} body: ${chatResponse.body}`);
       chatCreationErrors.add(1);
     }
 
     // Small delay to avoid overwhelming the API
-    sleep(0.5);
+    sleep(1.5);
   }
 
   console.log(`VU${vu}: Chat creation completed. Created ${chatIds.length} chats.`);
