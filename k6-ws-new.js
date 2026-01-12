@@ -28,8 +28,8 @@ const WS_URL           = __ENV.WS_URL           || 'wss://whisp-dev.api.whispcha
 const API_KEY          = __ENV.API_KEY          || '';
 const USER_PREFIX      = __ENV.USER_PREFIX      || 'user';
 const PASSWORD         = __ENV.PASSWORD         || 'password123';
-const TOTAL_USERS      = +(__ENV.TOTAL_USERS)      || 5000;
-const SEND_INTERVAL_MS = +(__ENV.SEND_INTERVAL_MS) || 6000;
+const TOTAL_USERS      = +(__ENV.TOTAL_USERS)      || 1250;
+const SEND_INTERVAL_MS = +(__ENV.SEND_INTERVAL_MS) || 10000;
 const SESSION_TIME_MS  = +(__ENV.SESSION_TIME_MS)  || 600000;
 const CHAT_REFRESH_MS  = +(__ENV.CHAT_REFRESH_MS)  || 30000;
 
