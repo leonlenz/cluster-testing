@@ -1,0 +1,3 @@
+npm init -y
+npm i @stomp/stompjs sockjs-client ws
+node whisp-e2e.js

@@ -1,9 +1,11 @@
 const WebSocket = require('ws');
 
-const url   = 'wss://subtle-zebra.api.whispchat.com/api/wsConnect';
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVVNFUiIsInVzZXJuYW1lIjoiYm9iYnkiLCJzdWIiOiI4MDZkNDY1MS0wZWE3LTRlNGYtYjMyNS0xZTQzYzBjMDNmNTciLCJpYXQiOjE3NDk4MzUzMzMsImV4cCI6MTc0OTgzNTYzM30.96o62Su0xFvQgiE5by5oMuGWHnwtrVeOmgZON9NVH9o';
+const url   = 'wss://demo-api.api.whispchat.com/api/wsConnect';
+const token = '<jwt>';
+const ticket = "<ticket>"
 
-const ws = new WebSocket(url, {
+
+const ws = new WebSocket(url + '?ticket=' + ticket, {
   headers: { Authorization: `Bearer ${token}` },
   rejectUnauthorized: false // skip TLS verify if needed
 });
