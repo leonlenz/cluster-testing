@@ -13,7 +13,7 @@ const SockJS = require('sockjs-client');
 const WebSocket = require('ws');
 global.WebSocket = WebSocket;
 
-const BASE_URL = "https://whisp-demo.api.whispchat.com"; //mustGetEnv('WHISP_BASE_URL');
+const BASE_URL = "https://whisp-dev.api.whispchat.com"; //mustGetEnv('WHISP_BASE_URL');
 const API_KEY = "8Nj2zKISsZOf0U2IIh2tdpEvvRQVEmVP"; //mustGetEnv('WHISP_API_KEY');
 const PASSWORD = process.env.WHISP_PASSWORD || 'ChangeMe!12345';
 const RUN_NEGATIVE = (process.env.WHISP_RUN_NEGATIVE || 'false').toLowerCase() === 'true';
