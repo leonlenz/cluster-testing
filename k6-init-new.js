@@ -44,17 +44,17 @@ function jsonHeaders(extra = {}) {
 export const options = {
   scenarios: {
     // Stage 1: User Registration
-    // user_registration: {
-    //   executor: 'ramping-vus',
-    //   stages: [
-    //     { duration: '3m', target: TOTAL_USERS }, // ramp up
-    //     { duration: '3m', target: TOTAL_USERS }, // hold (we guard to only do work once per VU)
-    //     { duration: '1m', target: 0 },           // ramp down
-    //   ],
-    //   exec: 'registerUsers',
-    //   startTime: '0s',
-    //   gracefulStop: '30s',
-    // },
+    user_registration: {
+      executor: 'ramping-vus',
+      stages: [
+        { duration: '3m', target: TOTAL_USERS }, // ramp up
+        { duration: '3m', target: TOTAL_USERS }, // hold (we guard to only do work once per VU)
+        { duration: '1m', target: 0 },           // ramp down
+      ],
+      exec: 'registerUsers',
+      startTime: '0s',
+      gracefulStop: '30s',
+    },
 
     // Stage 2: Chat Creation
     chat_creation: {
@@ -65,7 +65,7 @@ export const options = {
         { duration: '1m', target: 0 },
       ],
       exec: 'createChats',
-      startTime: '10m',
+      startTime: '7m',
       gracefulStop: '30s',
     },
   },
@@ -73,8 +73,7 @@ export const options = {
 
 // Stage 1: Register + verify signin (once per VU)
 export function registerUsers() {
-  if (__ITER > 0) {
-    // Prevent repeated registrations during the "hold" stage.
+  if (exec.vu.iterationInScenario > 0) {
     sleep(10);
     return;
   }
@@ -144,11 +143,10 @@ export function registerUsers() {
 
 // Stage 2: Create chats (once per VU)
 export function createChats() {
-  //if (__ITER > 0) {
-    // Prevent repeated chat creation during the "hold" stage.
-    //sleep(10);
-    //return;
-  //}
+  if (exec.vu.iterationInScenario > 0) {
+    sleep(10);
+    return;
+  }
 
   const vu = __VU;
   const username = `${USER_PREFIX}${vu}`;
