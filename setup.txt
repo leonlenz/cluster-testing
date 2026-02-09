@@ -1,0 +1,48 @@
+======= VM SETUP ======= 
+
+generate key pair:
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy_key -C "vm-readonly"
+
+GitHub → Repo → Settings → Deploy keys
+ -> Add key
+
+Host github.com
+  IdentityFile ~/.ssh/github_deploy_key
+  IdentitiesOnly yes
+
+clone repo using ssh
+
+
+======= setup + start influx ======= 
+
+mkdir -p influxdb-data grafana-data
+
+docker-compose up -d
+
+
+=======  run k6 ======= 
+
+k6 run --out influxdb=http://k6_writer:password@localhost:8086/k6 k6-ws-new-min.js
+
+
+======= setup grafana ======= 
+
+TODO: add instructions for setting up grafana
+
+sudo systemctl status grafana-server
+
+
+======= Install k6 ======= 
+
+sudo apt-get update
+sudo apt-get install -y gnupg apt-transport-https software-properties-common
+sudo gpg --no-default-keyring \
+     --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+     --keyserver hkp://keyserver.ubuntu.com:80 \
+     --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+
+sudo apt-get update
+sudo apt-get install -y k6
+
